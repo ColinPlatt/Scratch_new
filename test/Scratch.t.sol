@@ -6,13 +6,12 @@ import "forge-std/Test.sol";
 
 contract ScratchTest is Test {
     
-    function basicFunction() public returns (string memory) {
+    function basicFunction() internal returns (string memory) {
         return "this works";
     }
 
-    
-
     struct testStruct {
+        string _string;
         function () returns (string memory) f;
     }
 
@@ -21,7 +20,7 @@ contract ScratchTest is Test {
         uint ptr;
     }
 
-    function toSlice(function () returns (string memory) self) internal view returns (slice memory) {
+    function toSlice(testStruct memory self) internal view returns (slice memory) {
         uint len;
         uint ptr;
         assembly {
@@ -53,8 +52,8 @@ contract ScratchTest is Test {
         }
     }
 
-    function fromSlice(slice memory self) internal view returns (bytes memory) {
-        bytes memory ret;
+    function fromSlice(slice memory self) internal view returns (testStruct memory) {
+        testStruct memory ret;
         uint retptr;
         assembly { retptr := add(ret, 0x20) }
 
@@ -63,14 +62,13 @@ contract ScratchTest is Test {
     }
 
     function testSelector() public {
-        function () returns (string memory) f = basicFunction;
+        testStruct memory _struct = testStruct("doesn't find this, who cares", basicFunction);
 
-        slice memory _slice = toSlice(f);
+        slice memory _slice = toSlice(_struct);
 
-        emit log_uint(_slice.len);
-        emit log_uint(_slice.ptr);
+        testStruct memory _out = fromSlice(_slice);
 
-        emit log_bytes(fromSlice(_slice));
+        emit log_string(_out.f());
 
     }
 
