@@ -61,14 +61,15 @@ contract ScratchTest is Test {
         return ret;
     }
 
-    function testSelector() public {
+    function testEncodeDecode() public {
         testStruct memory _struct = testStruct("doesn't find this, who cares", basicFunction);
 
         slice memory _slice = toSlice(_struct);
 
-        testStruct memory _out = fromSlice(_slice);
+        testStruct memory _decoded = fromSlice(_slice);
 
-        emit log_string(_out.f());
+        emit log_string(_decoded._string);
+        assertEq(_decoded.f(), "this works");
 
     }
 
